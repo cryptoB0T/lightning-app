@@ -53,6 +53,20 @@ class PaymentAction {
     }
   }
 
+  async estimateFee() {
+    try {
+      const { payment, settings } = this._store;
+      const AddrToAmount = {};
+      AddrToAmount[payment.address] = toSatoshis(payment.amount, settings.unit);
+      const { estimate } = await this._grpc.sendCommand('estimateFee', {
+        AddrToAmount,
+      });
+      payment.fee = estimate.fee_sat;
+    } catch (err) {
+      this._notification.display({ msg: 'Estimating fee failed!', err });
+    }
+  }
+
   async payBitcoin() {
     try {
       const { payment, settings } = this._store;

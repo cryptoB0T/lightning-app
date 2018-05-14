@@ -39,6 +39,7 @@ describe('Action Payments Unit Tests', () => {
       payment.init();
       expect(store.payment.address, 'to equal', '');
       expect(store.payment.amount, 'to equal', '');
+      expect(store.payment.fee, 'to equal', '');
       expect(store.payment.note, 'to equal', '');
       expect(nav.goPay, 'was called once');
     });
@@ -77,6 +78,31 @@ describe('Action Payments Unit Tests', () => {
       expect(store.payment.amount, 'to be', '');
       expect(store.payment.note, 'to be', '');
       expect(logger.info, 'was called once');
+    });
+  });
+
+  describe('estimateFee()', () => {
+    it('should get fee estimate to display', async () => {
+      store.payment.amount = '0.00001';
+      store.payment.address = 'some-address';
+      grpc.sendCommand.withArgs('estimateFee').resolves({
+        estimate: {
+          fee_sat: '8250',
+          feerate_sat_per_byte: '50',
+        },
+      });
+      await payment.estimateFee();
+      expect(grpc.sendCommand, 'was called with', 'estimateFee', {
+        AddrToAmount: { 'some-address': 1000 },
+      });
+      expect(store.payment.fee, 'to equal', '8250');
+    });
+
+    it('should display notification on error', async () => {
+      grpc.sendCommand.withArgs('estimateFee').rejects();
+      await payment.estimateFee();
+      expect(notification.display, 'was called once');
+      expect(store.payment.fee, 'to equal', '');
     });
   });
 

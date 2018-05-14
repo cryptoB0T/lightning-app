@@ -245,9 +245,14 @@ describe('Action Integration Tests', function() {
       transactions2.subscribeTransactions();
     });
 
-    it('should send some on-chain funds to node2', async () => {
+    it('should estimate on-chain fees', async () => {
       store1.payment.address = store2.walletAddress;
       store1.payment.amount = '10';
+      await payments1.estimateFee();
+      expect(store1.payment.fee, 'to be ok');
+    });
+
+    it('should send some on-chain funds to node2', async () => {
       await payments1.payBitcoin();
     });
 
