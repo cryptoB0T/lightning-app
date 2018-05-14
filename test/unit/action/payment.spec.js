@@ -95,7 +95,7 @@ describe('Action Payments Unit Tests', () => {
       expect(grpc.sendCommand, 'was called with', 'estimateFee', {
         AddrToAmount: { 'some-address': 1000 },
       });
-      expect(store.payment.fee, 'to equal', '8250');
+      expect(store.payment.fee, 'to equal', '0.0000825');
     });
 
     it('should display notification on error', async () => {

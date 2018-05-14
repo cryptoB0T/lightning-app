@@ -61,7 +61,7 @@ class PaymentAction {
       const { estimate } = await this._grpc.sendCommand('estimateFee', {
         AddrToAmount,
       });
-      payment.fee = estimate.fee_sat;
+      payment.fee = toAmount(estimate.fee_sat, settings.unit);
     } catch (err) {
       this._notification.display({ msg: 'Estimating fee failed!', err });
     }
